@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "check": "biome check --write .",
+    "typecheck": "tsc --noEmit --project tsconfig.app.json",
     "preview": "vite preview"
   },
   "dependencies": {
