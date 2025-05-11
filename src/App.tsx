@@ -1,133 +1,149 @@
 "use client";
-
 import { useState } from "react";
-import viteLogo from "/vite.svg";
-import biomeLogo from "./assets/biome.svg";
-import reactLogo from "./assets/react.svg";
-import tailwindLogo from "./assets/tailwind.svg";
+import { Cell } from "./components/cell";
+
+const countAroundBombs = (x: number, y: number, bombs: Bomb[]) => {
+  let bombCount = 0;
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      if (bombs.some((bomb) => bomb.x === x + i && bomb.y === y + j)) {
+        bombCount++;
+      }
+    }
+  }
+  return bombCount;
+};
+
+const getBombsPositions = (quantity: number, exclude: Bomb) => {
+  const bombs: Bomb[] = [];
+  while (bombs.length < quantity) {
+    const x = Math.floor(Math.random() * 9);
+    const y = Math.floor(Math.random() * 9);
+    if (
+      !bombs.some((bomb) => bomb.x === x && bomb.y === y) &&
+      !(x === exclude.x && y === exclude.y)
+    ) {
+      bombs.push({ x, y });
+    }
+  }
+  return bombs;
+};
+
+const generateBombPlacedBoard = (board: number[][], bombs: Bomb[]) => {
+  const bombPlacedBoard = structuredClone(board);
+  for (const bomb of bombs) {
+    bombPlacedBoard[bomb.y][bomb.x] = cellNumberType.BOMB;
+  }
+  return bombPlacedBoard;
+};
+
+const generateNumberPlacedBoard = (board: number[][], bombs: Bomb[]) => {
+  const numberPlacedBoard = structuredClone(board);
+  for (let y = 0; y < numberPlacedBoard.length; y++) {
+    for (let x = 0; x < numberPlacedBoard[y].length; x++) {
+      if (numberPlacedBoard[y][x] === cellNumberType.OPENED[0]) {
+        const bombCount = countAroundBombs(x, y, bombs);
+        numberPlacedBoard[y][x] = bombCount;
+      }
+    }
+  }
+  return numberPlacedBoard;
+};
+
+const checkIsGameOver = (board: number[][], bombsPositions: Bomb[]) => {
+  for (const bomb of bombsPositions) {
+    if (cellNumberType.OPENED.includes(board[bomb.y][bomb.x])) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const INITIAL_BOARD = Array(9)
+  .fill(0)
+  .map(() => Array(9).fill(-10));
+
+interface Bomb {
+  x: number;
+  y: number;
+}
+
+export const cellNumberType = {
+  CLOSED: -10,
+  OPENED: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  BOMB: 100,
+};
 
 function App() {
-  const [count, setCount] = useState<number>(0);
+  const [board, setBoard] = useState<number[][]>(INITIAL_BOARD);
+  const [bombs, setBombs] = useState<Bomb[]>([]);
+  const [bombQuantity, setBombQuantity] = useState(10);
+
+  const handleClick = (x: number, y: number) => {
+    if (bombs.length === 0) setBombs(getBombsPositions(bombQuantity, { x, y }));
+    const newBoard = structuredClone(board);
+    newBoard[y][x] = cellNumberType.OPENED[0];
+    setBoard(newBoard);
+  };
+
+  const handleReset = () => {
+    setBoard(INITIAL_BOARD);
+    setBombs([]);
+  };
+
+  const handleBombQuantityChange = (quantity: number) => {
+    handleReset();
+    setBombQuantity(quantity);
+  };
+
+  const viewItems = {
+    boardView: generateNumberPlacedBoard(board, bombs),
+    isGameOver: false,
+  };
+
+  viewItems.isGameOver = checkIsGameOver(viewItems.boardView, bombs);
+
+  if (viewItems.isGameOver) {
+    viewItems.boardView = generateBombPlacedBoard(viewItems.boardView, bombs);
+  }
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 text-center md:p-8 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
-      <div className="mx-auto w-full max-w-4xl rounded-2xl bg-white/90 p-6 shadow-xl backdrop-blur-sm md:p-10 dark:bg-gray-800/90">
-        <div className="mb-8 flex flex-wrap justify-center gap-8">
-          <a
-            href="https://vite.dev"
-            target="_blank"
-            className="group"
-            rel="noreferrer"
-          >
-            <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-white p-4 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl dark:bg-gray-700">
-              <img
-                src={viteLogo || "/placeholder.svg"}
-                className="h-20 w-20 object-contain p-2 transition-all duration-500 group-hover:drop-shadow-[0_0_1.5em_#646cffaa]"
-                alt="Vite logo"
-              />
-            </div>
-          </a>
-          <a
-            href="https://react.dev"
-            target="_blank"
-            className="group"
-            rel="noreferrer"
-          >
-            <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-white p-4 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl dark:bg-gray-700">
-              <img
-                src={reactLogo || "/placeholder.svg"}
-                className="h-20 w-20 object-contain p-2 transition-all duration-500 group-hover:drop-shadow-[0_0_1.5em_#61dafbaa]"
-                alt="React logo"
-              />
-            </div>
-          </a>
-          <a
-            href="https://tailwindcss.com"
-            target="_blank"
-            className="group"
-            rel="noreferrer"
-          >
-            <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-white p-4 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl dark:bg-gray-700">
-              <img
-                src={tailwindLogo || "/placeholder.svg"}
-                className="h-20 w-20 object-contain p-2 transition-all duration-500 group-hover:drop-shadow-[0_0_1.5em_#44a8b3aa]"
-                alt="Tailwind logo"
-              />
-            </div>
-          </a>
-          <a
-            href="https://biomejs.dev"
-            target="_blank"
-            className="group"
-            rel="noreferrer"
-          >
-            <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-white p-4 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl dark:bg-gray-700">
-              <img
-                src={biomeLogo || "/placeholder.svg"}
-                className="h-20 w-20 object-contain p-2 transition-all duration-500 group-hover:drop-shadow-[0_0_1.5em_#F25022aa]"
-                alt="Biome logo"
-              />
-            </div>
-          </a>
-        </div>
-
-        <h1 className="mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text font-bold text-4xl text-transparent md:text-5xl dark:from-blue-400 dark:to-purple-400">
-          Vite + React + Tailwind + Biome
-        </h1>
-
-        <div className="mb-8 inline-block rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-blue-800 text-sm dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-          Fast Development Environment
-        </div>
-
-        <div className="mx-auto mb-6 max-w-md rounded-xl bg-gradient-to-br from-white to-blue-50 p-6 shadow-md dark:from-gray-700 dark:to-gray-800">
-          <div className="flex flex-col items-center">
-            <button
-              type="button"
-              onClick={() => setCount((count) => count + 1)}
-              className="rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-2 font-medium text-white shadow-md transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-purple-600 hover:shadow-lg"
-            >
-              Count: {count}
-            </button>
-
-            <p className="mt-4 text-center text-gray-600 dark:text-gray-300">
-              <code className="rounded bg-gray-100 px-1 py-0.5 font-mono text-sm dark:bg-gray-800">
-                src/App.tsx
-              </code>{" "}
-              Edit and save to test HMR
-            </p>
-          </div>
-        </div>
-
-        <div className="flex justify-center">
-          <a
-            href="https://vitejs.dev/guide/"
-            target="_blank"
-            rel="noreferrer"
-            className="group flex items-center text-blue-600 transition-colors duration-200 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-          >
-            Learn more about Vite and React
-            <svg
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              className="ml-2 h-4 w-4 transform transition-transform duration-200 group-hover:translate-x-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14 5l7 7m0 0l-7 7m7-7H3"
-              />
-            </svg>
-          </a>
-        </div>
+    <div className="flex h-screen flex-col items-center justify-center">
+      <button type="button" onClick={handleReset}>
+        Reset
+      </button>
+      <div>
+        <button
+          type="button"
+          className="border-2 border-gray-400 px-2"
+          onClick={() => handleBombQuantityChange(10)}
+        >
+          10
+        </button>
+        <button
+          type="button"
+          onClick={() => handleBombQuantityChange(20)}
+          className="border-2 border-gray-400 px-2"
+        >
+          20
+        </button>
       </div>
-
-      <p className="mt-6 text-gray-500 text-sm dark:text-gray-400">
-        Click on the Vite and React logos to learn more
-      </p>
+      {viewItems.isGameOver && <div>Game Over</div>}
+      <div className="flex size-[450px] flex-wrap bg-gray-200">
+        {viewItems.boardView.map((row, y) => (
+          <div key={`${y} ${row}`} className="flex">
+            {row.map((cell, x) => (
+              <Cell
+                key={`${x}-${y}-${cell}`}
+                number={cell}
+                onClick={() => handleClick(x, y)}
+                x={x}
+                y={y}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
