@@ -1,55 +1,69 @@
-# React + TypeScript + Vite
+# Vite React Starter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a React application built using [Vite](https://vitejs.dev/).
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [Vite](https://vitejs.dev/) - Fast development environment
+- [React](https://react.dev/) - UI library
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Biome](https://biomejs.dev/) - Linter and formatter
+- [Lefthook](https://github.com/evilmartians/lefthook) - Git hooks manager
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+First, run the development server:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+You can start editing the page by modifying `src/App.tsx`. The page auto-updates as you edit the file.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## Commands
+
+```bash
+# Start the development server
+npm run dev
+
+# Create a production build
+npm run build
+
+# Preview the build
+npm run preview
+
+# Run linting
+npm run lint
+
+# Run formatting
+npm run format
 ```
-# vite-react-starter
+
+## VS Code Configuration
+
+This project recommends the following VS Code extensions:
+
+- [Biome](https://marketplace.visualstudio.com/items?itemName=biomejs.biome) - Code linting and formatting
+- [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) - Tailwind CSS class completion
+- [Pretty TypeScript Errors](https://marketplace.visualstudio.com/items?itemName=yoavbls.pretty-ts-errors) - Improved TypeScript error display
+
+## Deploying to GitHub Pages
+
+To deploy this project to GitHub Pages:
+
+1. Go to the "Settings" tab of your GitHub repository
+2. Select "Pages" from the sidebar
+3. Choose "GitHub Actions" in the "Source" section
+
+## Learn More
+
+- [Vite Documentation](https://vitejs.dev/guide/) - Learn about Vite features and API
+- [React Documentation](https://react.dev/learn) - Learn about React
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs) - Learn about Tailwind CSS
+- [Biome Documentation](https://biomejs.dev/guides/) - Learn about Biome 
