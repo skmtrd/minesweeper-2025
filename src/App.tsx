@@ -59,6 +59,33 @@ const checkIsGameOver = (board: number[][], bombsPositions: Bomb[]) => {
   return false;
 };
 
+const generateCellOpenedBoard = (
+  board: number[][],
+  bombs: Bomb[],
+  x: number,
+  y: number,
+) => {
+  const cellOpenedBoard = structuredClone(board);
+  const openRecursion = (x: number, y: number) => {
+    cellOpenedBoard[y][x] = cellNumberType.OPENED[0];
+    if (countAroundBombs(x, y, bombs) > 0) {
+      return;
+    }
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        if (
+          cellOpenedBoard[y + i] !== undefined &&
+          cellOpenedBoard[y + i][x + j] === cellNumberType.CLOSED
+        ) {
+          openRecursion(x + j, y + i);
+        }
+      }
+    }
+  };
+  openRecursion(x, y);
+  return cellOpenedBoard;
+};
+
 const INITIAL_BOARD = Array(9)
   .fill(0)
   .map(() => Array(9).fill(-10));
@@ -80,10 +107,15 @@ function App() {
   const [bombQuantity, setBombQuantity] = useState(10);
 
   const handleClick = (x: number, y: number) => {
-    if (bombs.length === 0) setBombs(getBombsPositions(bombQuantity, { x, y }));
-    const newBoard = structuredClone(board);
-    newBoard[y][x] = cellNumberType.OPENED[0];
-    setBoard(newBoard);
+    if (bombs.length === 0) {
+      const newBombs = getBombsPositions(bombQuantity, { x, y });
+      setBombs(newBombs);
+      const newBoard = generateCellOpenedBoard(board, newBombs, x, y);
+      setBoard(newBoard);
+    } else {
+      const newBoard = generateCellOpenedBoard(board, bombs, x, y);
+      setBoard(newBoard);
+    }
   };
 
   const handleReset = () => {
